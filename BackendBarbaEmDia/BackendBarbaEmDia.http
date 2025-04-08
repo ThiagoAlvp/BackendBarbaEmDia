@@ -1,0 +1,6 @@
+@BackendBarbaEmDia_HostAddress = http://localhost:5243
+
+GET {{BackendBarbaEmDia_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

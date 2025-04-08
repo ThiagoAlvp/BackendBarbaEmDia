@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>5a471e83-0585-4a61-a846-48307c43fb06</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BackendBarbaEmDia.Domain\BackendBarbaEmDia.Domain.csproj" />
+    <ProjectReference Include="..\BackendBarbaEmDia.Infraestructure.Data\BackendBarbaEmDia.Infraestructure.Data.csproj" />
+  </ItemGroup>
+
+</Project>
