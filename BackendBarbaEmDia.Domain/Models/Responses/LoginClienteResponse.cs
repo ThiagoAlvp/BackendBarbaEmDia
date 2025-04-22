@@ -1,10 +1,8 @@
 ﻿namespace BackendBarbaEmDia.Domain.Models.Responses
 {
-    public class LoginClienteResponse
+    public class LoginClienteResponse(ClienteResponse cliente)
     {
-        public required int Id { get; set; }
-        public required string Token { get; set; }
-        public required string Nome { get; set; }
-        public string Telefone { get; set; } = string.Empty;
+        public ClienteResponse Cliente { get; set; } = cliente;
+        public string Token { get; set; } = "";
     }
 }

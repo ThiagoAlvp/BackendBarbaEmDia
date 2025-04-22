@@ -1,5 +1,10 @@
-﻿using BackendBarbaEmDia.Domain.Models.Requests;
+﻿using BackendBarbaEmDia.Domain.Interfaces.Services;
+using BackendBarbaEmDia.Domain.Models.Requests;
 using BackendBarbaEmDia.Domain.Models.Responses;
+using BackendBarbaEmDia.Extensions;
+using BackendBarbaEmDia.Models.Responses;
+using BackendBarbaEmDia.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -8,25 +13,32 @@ namespace BackendBarbaEmDia.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ClientesController : ControllerBase
     {
+        private readonly IClienteService _clienteService;
+        private readonly ITokenService _tokenService;
+
+        public ClientesController(IClienteService clienteService,
+                                  ITokenService tokenService)
+        {
+            _clienteService = clienteService;
+            _tokenService = tokenService;
+        }
+
         // POST api/<ClientesController>/Login
         [HttpPost("Login")]
-        public ActionResult<APIResponse<LoginClienteResponse>> Login([FromBody] LoginClienteRequest request)
+        [AllowAnonymous]
+        public async Task<ActionResult<APIResponse<LoginClienteResponse>>> Login([FromBody] LoginClienteRequest request)
         {
-            if (request.NrTelefone.Length < 11)
-                return BadRequest(new APIResponse<LoginClienteResponse>(false, "Número de telefone deve ter pelo menos 11 digítos."));
+            ServiceResult<LoginClienteResponse> result = await _clienteService.VerificaClienteLogin(request);
 
-            LoginClienteResponse loginClienteResponse =
-                new()
-                {
-                    Id = 1,
-                    Nome = "Cliente Teste",
-                    Telefone = "11999999999",
-                    Token = "token",
-                };
+            if (!result.Success)
+                return this.TrataServiceResult(result);
 
-            return Ok(new APIResponse<LoginClienteResponse>(loginClienteResponse,"Login realizado com sucesso!"));
+            _tokenService.PreencherToken(result.Data!);
+
+            return this.TrataServiceResult(result);
         }
     }
 }
