@@ -3,6 +3,7 @@ using System;
 using BackendBarbaEmDia.Infraestructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
 {
     [DbContext(typeof(BarbeariaContext))]
-    [Migration("20250422204340_PrimeiroMigration")]
+    [Migration("20250424144410_PrimeiroMigration")]
     partial class PrimeiroMigration
     {
         /// <inheritdoc />
@@ -22,11 +23,42 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                 .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Administrador", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Senha")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Telefone")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Administradores");
+                });
+
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Agendamento", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DataHoraInicio")
                         .HasColumnType("datetime(6)");
@@ -64,6 +96,8 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<bool>("Ativo")
                         .HasColumnType("tinyint(1)");
 
@@ -78,6 +112,12 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
 
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.BarbeiroServico", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("IdBarbeiro")
                         .HasColumnType("int");
 
@@ -87,7 +127,9 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                     b.Property<TimeSpan?>("TempoPersonalizado")
                         .HasColumnType("time(6)");
 
-                    b.HasKey("IdBarbeiro", "IdServico");
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdBarbeiro");
 
                     b.HasIndex("IdServico");
 
@@ -99,6 +141,8 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nome")
                         .HasColumnType("longtext");
@@ -118,6 +162,11 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -125,9 +174,36 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                     b.Property<TimeSpan>("DuracaoPadrao")
                         .HasColumnType("time(6)");
 
+                    b.Property<decimal>("Preco")
+                        .HasColumnType("decimal(65,30)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Servicos");
+                });
+
+            modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Travamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataHoraFim")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DataHoraInicio")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("IdBarbeiro")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdBarbeiro");
+
+                    b.ToTable("Travamentos");
                 });
 
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Agendamento", b =>
@@ -176,11 +252,24 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                     b.Navigation("Servico");
                 });
 
+            modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Travamento", b =>
+                {
+                    b.HasOne("BackendBarbaEmDia.Domain.Models.Database.Barbeiro", "Barbeiro")
+                        .WithMany("Travamentos")
+                        .HasForeignKey("IdBarbeiro")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Barbeiro");
+                });
+
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Barbeiro", b =>
                 {
                     b.Navigation("Agendamentos");
 
                     b.Navigation("BarbeiroServicos");
+
+                    b.Navigation("Travamentos");
                 });
 
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Cliente", b =>

@@ -36,7 +36,7 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Repositories
             return await _context.FindAsync<T>(id);
         }
 
-        public async Task<IEnumerable<T>> GetListAsync(Expression<Func<T, bool>>? condition = null)
+        public async Task<List<T>> GetListAsync(Expression<Func<T, bool>>? condition = null)
         {
             IQueryable<T> query = _context.Set<T>().AsQueryable();
 
@@ -59,9 +59,9 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Repositories
             return await query.CountAsync();
         }
 
-        public async Task<IEnumerable<T>> GetListWithIncludesAsync(
+        public async Task<List<T>> GetListWithIncludesAsync(
             Expression<Func<T, bool>>? condition = null,
-            params Expression<Func<T, object>>[] includes)
+            params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _context.Set<T>().AsQueryable();
             if (condition is not null)
@@ -75,7 +75,7 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Repositories
 
         public async Task<T?> GetFirstWithIncludesAsync(
             Expression<Func<T, bool>> condition,
-            params Expression<Func<T, object>>[] includes)
+            params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _context.Set<T>().Where(condition).AsQueryable();
 

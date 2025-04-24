@@ -1,12 +1,10 @@
-﻿namespace BackendBarbaEmDia.Domain.Models.Database
+﻿namespace BackendBarbaEmDia.Domain.Models.Requests
 {
-    public class Travamento
+    public class AddUpdateTravamentoRequest
     {
-        public int Id { get; set; }
         public int IdBarbeiro { get; set; }
         public string Motivo { get; set; } = "";
         public DateTime DataHoraInicio { get; set; }
         public DateTime DataHoraFim { get; set; }
-        public Barbeiro? Barbeiro { get; set; }
     }
 }

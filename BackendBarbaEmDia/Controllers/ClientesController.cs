@@ -13,7 +13,7 @@ namespace BackendBarbaEmDia.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Administrador")]
     public class ClientesController : ControllerBase
     {
         private readonly IClienteService _clienteService;
@@ -36,7 +36,7 @@ namespace BackendBarbaEmDia.Controllers
             if (!result.Success)
                 return this.TrataServiceResult(result);
 
-            _tokenService.PreencherToken(result.Data!);
+            _tokenService.PreencherTokenCliente(result.Data!);
 
             return this.TrataServiceResult(result);
         }

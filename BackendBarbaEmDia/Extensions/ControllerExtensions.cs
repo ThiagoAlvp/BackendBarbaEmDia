@@ -31,5 +31,20 @@ namespace BackendBarbaEmDia.Extensions
 
             return controller.Ok((APIResponse<T>)serviceResult);
         }
+
+        public static ActionResult<APIResponse> TrataServiceResult(this ControllerBase controller, ServiceResult serviceResult)
+        {
+            if (serviceResult.ExceptionGenerated)
+            {
+                return controller.StatusCode(StatusCodes.Status500InternalServerError, (APIResponse)serviceResult);
+            }
+
+            if (!serviceResult.Success)
+            {
+                return controller.BadRequest((APIResponse)serviceResult);
+            }
+
+            return controller.Ok((APIResponse)serviceResult);
+        }
     }
 }

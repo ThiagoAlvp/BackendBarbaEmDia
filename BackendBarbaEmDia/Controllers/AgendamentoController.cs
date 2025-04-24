@@ -10,9 +10,9 @@ namespace BackendBarbaEmDia.Controllers
     {
         // GET: api/<AgendamentoController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public List<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new string[] { "value1", "value2" }.ToList();
         }
 
         // GET api/<AgendamentoController>/5

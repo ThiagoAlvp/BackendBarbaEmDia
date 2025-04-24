@@ -3,6 +3,7 @@ using System;
 using BackendBarbaEmDia.Infraestructure.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
 {
     [DbContext(typeof(BarbeariaContext))]
-    [Migration("20250422205104_TabelaTravamentos")]
-    partial class TabelaTravamentos
+    [Migration("20250424171541_CriacaoParametrizacaoHorarioFuncionamento")]
+    partial class CriacaoParametrizacaoHorarioFuncionamento
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,11 +23,42 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                 .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Administrador", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Senha")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Telefone")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Administradores");
+                });
+
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Agendamento", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DataHoraInicio")
                         .HasColumnType("datetime(6)");
@@ -64,6 +96,8 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<bool>("Ativo")
                         .HasColumnType("tinyint(1)");
 
@@ -78,6 +112,12 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
 
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.BarbeiroServico", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("IdBarbeiro")
                         .HasColumnType("int");
 
@@ -87,7 +127,9 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                     b.Property<TimeSpan?>("TempoPersonalizado")
                         .HasColumnType("time(6)");
 
-                    b.HasKey("IdBarbeiro", "IdServico");
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdBarbeiro");
 
                     b.HasIndex("IdServico");
 
@@ -99,6 +141,8 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nome")
                         .HasColumnType("longtext");
@@ -112,11 +156,89 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                     b.ToTable("Clientes");
                 });
 
+            modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.ParametrizacaoHorarioFuncionamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DiaSemana")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("HoraFim")
+                        .HasColumnType("time(6)");
+
+                    b.Property<TimeSpan>("HoraInicio")
+                        .HasColumnType("time(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ParametrizacaoHorarioFuncionamento");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DiaSemana = 1,
+                            HoraFim = new TimeSpan(0, 0, 0, 0, 0),
+                            HoraInicio = new TimeSpan(0, 0, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DiaSemana = 2,
+                            HoraFim = new TimeSpan(0, 19, 0, 0, 0),
+                            HoraInicio = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DiaSemana = 3,
+                            HoraFim = new TimeSpan(0, 19, 0, 0, 0),
+                            HoraInicio = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DiaSemana = 4,
+                            HoraFim = new TimeSpan(0, 19, 0, 0, 0),
+                            HoraInicio = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DiaSemana = 5,
+                            HoraFim = new TimeSpan(0, 19, 0, 0, 0),
+                            HoraInicio = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            DiaSemana = 6,
+                            HoraFim = new TimeSpan(0, 16, 0, 0, 0),
+                            HoraInicio = new TimeSpan(0, 8, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            DiaSemana = 0,
+                            HoraFim = new TimeSpan(0, 0, 0, 0, 0),
+                            HoraInicio = new TimeSpan(0, 0, 0, 0, 0)
+                        });
+                });
+
             modelBuilder.Entity("BackendBarbaEmDia.Domain.Models.Database.Servico", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Descricao")
                         .IsRequired()
@@ -124,6 +246,9 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
 
                     b.Property<TimeSpan>("DuracaoPadrao")
                         .HasColumnType("time(6)");
+
+                    b.Property<decimal>("Preco")
+                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -136,6 +261,8 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTime>("DataHoraFim")
                         .HasColumnType("datetime(6)");
 
@@ -144,6 +271,10 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
 
                     b.Property<int>("IdBarbeiro")
                         .HasColumnType("int");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 

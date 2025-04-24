@@ -1,6 +1,6 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
@@ -13,65 +13,115 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("MySQL:Charset", "utf8mb4");
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Administradores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Nome = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Telefone = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Username = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Senha = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Administradores", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Barbeiros",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(type: "longtext", nullable: false),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Nome = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Barbeiros", x => x.Id);
                 })
-                .Annotation("MySQL:Charset", "utf8mb4");
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Clientes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(type: "longtext", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Nome = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Telefone = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Clientes", x => x.Id);
                 })
-                .Annotation("MySQL:Charset", "utf8mb4");
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Servicos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Descricao = table.Column<string>(type: "longtext", nullable: false),
-                    DuracaoPadrao = table.Column<TimeSpan>(type: "time(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Descricao = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DuracaoPadrao = table.Column<TimeSpan>(type: "time(6)", nullable: false),
+                    Preco = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Servicos", x => x.Id);
                 })
-                .Annotation("MySQL:Charset", "utf8mb4");
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Travamentos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    IdBarbeiro = table.Column<int>(type: "int", nullable: false),
+                    DataHoraInicio = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DataHoraFim = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Travamentos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Travamentos_Barbeiros_IdBarbeiro",
+                        column: x => x.IdBarbeiro,
+                        principalTable: "Barbeiros",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Agendamentos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     IdCliente = table.Column<int>(type: "int", nullable: false),
                     IdBarbeiro = table.Column<int>(type: "int", nullable: false),
                     IdServico = table.Column<int>(type: "int", nullable: false),
                     DataHoraInicio = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Duracao = table.Column<TimeSpan>(type: "time(6)", nullable: false),
                     Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -95,19 +145,21 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 })
-                .Annotation("MySQL:Charset", "utf8mb4");
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "BarbeiroServicos",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     IdBarbeiro = table.Column<int>(type: "int", nullable: false),
                     IdServico = table.Column<int>(type: "int", nullable: false),
                     TempoPersonalizado = table.Column<TimeSpan>(type: "time(6)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BarbeiroServicos", x => new { x.IdBarbeiro, x.IdServico });
+                    table.PrimaryKey("PK_BarbeiroServicos", x => x.Id);
                     table.ForeignKey(
                         name: "FK_BarbeiroServicos_Barbeiros_IdBarbeiro",
                         column: x => x.IdBarbeiro,
@@ -121,7 +173,7 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
-                .Annotation("MySQL:Charset", "utf8mb4");
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Agendamentos_IdBarbeiro",
@@ -139,14 +191,27 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                 column: "IdServico");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BarbeiroServicos_IdBarbeiro",
+                table: "BarbeiroServicos",
+                column: "IdBarbeiro");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BarbeiroServicos_IdServico",
                 table: "BarbeiroServicos",
                 column: "IdServico");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Travamentos_IdBarbeiro",
+                table: "Travamentos",
+                column: "IdBarbeiro");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Administradores");
+
             migrationBuilder.DropTable(
                 name: "Agendamentos");
 
@@ -154,13 +219,16 @@ namespace BackendBarbaEmDia.Infraestructure.Data.Migrations
                 name: "BarbeiroServicos");
 
             migrationBuilder.DropTable(
+                name: "Travamentos");
+
+            migrationBuilder.DropTable(
                 name: "Clientes");
 
             migrationBuilder.DropTable(
-                name: "Barbeiros");
+                name: "Servicos");
 
             migrationBuilder.DropTable(
-                name: "Servicos");
+                name: "Barbeiros");
         }
     }
 }
