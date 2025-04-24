@@ -3,6 +3,7 @@ using BackendBarbaEmDia.Domain.Models.Requests;
 using BackendBarbaEmDia.Domain.Models.Responses;
 using BackendBarbaEmDia.Extensions;
 using BackendBarbaEmDia.Models.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BackendBarbaEmDia.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = "Administrador")]
     [ApiController]
     public class BarbeiroServicoController : ControllerBase
     {

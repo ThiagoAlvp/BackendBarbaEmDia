@@ -5,13 +5,11 @@ namespace BackendBarbaEmDia.Domain.Interfaces.Services
 {
     public interface IAgendamentoService
     {
-        Task<ServiceResult> Agendar(AddUpdateAgendamento agendamento);
+        Task<ServiceResult> Agendar(AddUpdateAgendamentoRequest agendamento);
         Task<ServiceResult> Cancelar(int id);
-        Task<ServiceResult> Reagendar(int id, AddUpdateAgendamento agendamento);
-        Task<ServiceResult<List<AgendamentoResponse>>> ListarAgendamentos();
+        Task<ServiceResult> Reagendar(int id, AddUpdateAgendamentoRequest agendamento);
+        Task<ServiceResult<List<AgendamentoResponse>>> ListarAgendamentos(int? barbeiroId = null, int? clienteId = null, DateTime? data = null);
         Task<ServiceResult<AgendamentoResponse>> ObterAgendamentoPorId(int id);
-        Task<ServiceResult<List<AgendamentoResponse>>> ListarAgendamentosPorClienteId(int clienteId);
-        Task<ServiceResult<List<AgendamentoResponse>>> ListarAgendamentosPorBarbeiroId(int barbeiroId);
-        Task<ServiceResult<List<AgendamentoResponse>>> ListarAgendamentosPorData(DateTime data);
+        Task<ServiceResult<List<DateTime>>> ObterHorariosIndisponiveis(int idServico, int? idBarbeiro = null, TimeSpan? horarioPreferencialInicial = null, TimeSpan? horarioPreferencialFinal = null);
     }
 }

@@ -27,7 +27,7 @@ namespace BackendBarbaEmDia.Models.Responses
         }
     }
 
-    public class APIResponse<T> : APIResponse where T : class
+    public class APIResponse<T> : APIResponse
     {        
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public T? Data { get; set; }

@@ -96,6 +96,10 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBarbeiroService, BarbeiroService>();
 builder.Services.AddScoped<IServicoService, ServicoService>();
 builder.Services.AddScoped<IAdministradorService, AdministradorService>();
+builder.Services.AddScoped<IAgendamentoService, AgendamentoService>();
+builder.Services.AddScoped<ITravamentoService, TravamentoService>();
+builder.Services.AddScoped<IBarbeiroServicoService, BarbeiroServicoService>();
+builder.Services.AddScoped<IParametrizacaoHorarioFuncionamentoService, ParametrizacaoHorarioFuncionamentoService>();
 #endregion
 
 #region Repositories
@@ -106,6 +110,7 @@ builder.Services.AddScoped<IAdministradorRepository, AdministradorRepository>();
 builder.Services.AddScoped<IAgendamentosRepository, AgendamentosRepository>();
 builder.Services.AddScoped<IServicoRepository, ServicoRepository>();
 builder.Services.AddScoped<ITravamentosRepository, TravamentosRepository>();
+builder.Services.AddScoped<IParametrizacaoHorarioFuncionamentoRepository, ParametrizacaoHorarioFuncionamentoRepository>();
 #endregion
 
 var app = builder.Build();

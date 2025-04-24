@@ -21,7 +21,7 @@
         }
     }
 
-    public class ServiceResult<T> : ServiceResult where T : class
+    public class ServiceResult<T> : ServiceResult
     {
         public T? Data { get; set; }
 
