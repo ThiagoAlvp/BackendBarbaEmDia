@@ -113,6 +113,17 @@ builder.Services.AddScoped<ITravamentosRepository, TravamentosRepository>();
 builder.Services.AddScoped<IParametrizacaoHorarioFuncionamentoRepository, ParametrizacaoHorarioFuncionamentoRepository>();
 #endregion
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowEspecificOrigin",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -121,6 +132,11 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("AllowEspecificOrigin");
+}
 
 app.UseHttpsRedirection();
 
