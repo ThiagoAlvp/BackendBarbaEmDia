@@ -92,12 +92,11 @@ if (string.IsNullOrEmpty(connectionString))
     connectionString = builder.Configuration.GetConnectionString("Barbearia");
 }
 
-Console.WriteLine($"Connection String: {connectionString}");
-
 builder.Services.AddDbContext<BarbeariaContext>(options =>
    options.UseMySql(
        connectionString ?? "",
-       new MySqlServerVersion(new Version(8, 0, 32))));
+       new MySqlServerVersion(new Version(8, 0, 32)),
+       mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
 
 #region Services
 builder.Services.AddScoped<IClienteService, ClienteService>();
