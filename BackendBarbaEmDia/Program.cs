@@ -92,6 +92,8 @@ if (string.IsNullOrEmpty(connectionString))
     connectionString = builder.Configuration.GetConnectionString("Barbearia");
 }
 
+Console.WriteLine($"Connection String: {connectionString}");
+
 builder.Services.AddDbContext<BarbeariaContext>(options =>
    options.UseMySql(
        connectionString ?? "",
