@@ -85,9 +85,16 @@ builder.Services.AddSwaggerGen(options =>
         });
 });
 
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = builder.Configuration.GetConnectionString("Barbearia");
+}
+
 builder.Services.AddDbContext<BarbeariaContext>(options =>
    options.UseMySql(
-       builder.Configuration.GetConnectionString("Barbearia") ?? "",
+       connectionString ?? "",
        new MySqlServerVersion(new Version(8, 0, 32))));
 
 #region Services
