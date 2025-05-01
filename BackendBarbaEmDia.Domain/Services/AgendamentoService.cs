@@ -41,7 +41,7 @@ namespace BackendBarbaEmDia.Domain.Services
 
                 Agendamento agendamentoDb = new()
                 {
-                    IdBarbeiro = agendamento.IdBarbeiro,
+                    IdBarbeiro = agendamento.IdBarbeiro ?? 0,
                     IdCliente = agendamento.IdCliente,
                     IdServico = agendamento.IdServico,
                     DataHoraInicio = agendamento.DataHoraInicio,
@@ -73,7 +73,7 @@ namespace BackendBarbaEmDia.Domain.Services
                 if (agendamentoDb is null)
                     return new(false, "Agendamento não encontrado");
 
-                agendamentoDb.IdBarbeiro = agendamento.IdBarbeiro;
+                agendamentoDb.IdBarbeiro = agendamento.IdBarbeiro ?? 0;
                 agendamentoDb.IdCliente = agendamento.IdCliente;
                 agendamentoDb.IdServico = agendamento.IdServico;
                 agendamentoDb.DataHoraInicio = agendamento.DataHoraInicio;
@@ -142,7 +142,7 @@ namespace BackendBarbaEmDia.Domain.Services
                      (clienteId == null || x.IdCliente == clienteId) &&
                      (data == null || x.DataHoraInicio.Date == data.Value.Date);
 
-            return await ListarAgendamentosInternal();
+            return await ListarAgendamentosInternal(expression);
         }
 
         public async Task<ServiceResult<AgendamentoResponse>> ObterAgendamentoPorId(int id)
@@ -173,55 +173,76 @@ namespace BackendBarbaEmDia.Domain.Services
         {
             try
             {
-                List<DateTime> horariosIndisponiveis = [];
+                List<DateTime> horariosIndisponiveis = new();
 
                 ServiceResult<TimeSpan> duracaoServicoResult = await ObterDuracaoServico(idServico, idBarbeiro);
 
                 if (!duracaoServicoResult.Success)
                     return new(false, "Erro ao obter duração do serviço, " + duracaoServicoResult.Message);
 
-                List<Agendamento> agendamentos = await _agendamentoRepository
-                    .GetListAsync(x => (idBarbeiro == null || x.IdBarbeiro == idBarbeiro)&&
-                                       x.DataHoraInicio.Date >= DateTime.Now.Date
-                    );
+                List<BarbeiroServico> barbeirosServico = await _barbeiroServicoRepository.GetBarbeirosByServicoId(idServico);
 
-                foreach (Agendamento agendamento in agendamentos)
+                if (idBarbeiro is not null)
+                    barbeirosServico = barbeirosServico.Where(x => x.IdBarbeiro == idBarbeiro).ToList();
+
+                if (!barbeirosServico.Any())
+                    return new(false, "Nenhum barbeiro disponível para este serviço");
+
+                foreach (var barbeiroServico in barbeirosServico)
                 {
-                    DateTime dataHoraInicio = agendamento.DataHoraInicio;
-                    DateTime dataHoraFim = dataHoraInicio.Add(agendamento.Duracao);
+                    int idBarbeiroAtual = barbeiroServico.IdBarbeiro;
 
-                    for (DateTime horario = dataHoraInicio; horario < dataHoraFim; horario = horario.AddMinutes(15))
+                    List<Agendamento> agendamentos = await _agendamentoRepository
+                        .GetListAsync(x => x.IdBarbeiro == idBarbeiroAtual &&
+                                           x.DataHoraInicio.Date >= DateTime.Now.Date);
+
+                    foreach (Agendamento agendamento in agendamentos)
                     {
-                        if (horarioPreferencialInicial != null && horario.TimeOfDay < horarioPreferencialInicial)
-                            continue;
+                        DateTime dataHoraInicio = agendamento.DataHoraInicio;
+                        DateTime dataHoraFim = dataHoraInicio.Add(agendamento.Duracao);
 
-                        if (horarioPreferencialFinal != null && horario.TimeOfDay > horarioPreferencialFinal)
-                            continue;
+                        for (DateTime horario = dataHoraInicio; horario < dataHoraFim; horario = horario.AddMinutes(15))
+                        {
+                            if (horarioPreferencialInicial != null && horario.TimeOfDay < horarioPreferencialInicial)
+                                continue;
 
-                        horariosIndisponiveis.Add(horario);
+                            if (horarioPreferencialFinal != null && horario.TimeOfDay > horarioPreferencialFinal)
+                                continue;
+
+                            horariosIndisponiveis.Add(horario);
+                        }
+                    }
+
+                    List<Travamento> travamentos = await _travamentoRepository
+                        .GetListAsync(x => x.IdBarbeiro == idBarbeiroAtual &&
+                                           x.DataHoraInicio.Date >= DateTime.Now.Date);
+
+                    foreach (Travamento travamento in travamentos)
+                    {
+                        DateTime dataHoraInicio = travamento.DataHoraInicio;
+                        DateTime dataHoraFim = travamento.DataHoraFim;
+
+                        for (DateTime horario = dataHoraInicio; horario < dataHoraFim; horario = horario.AddMinutes(15))
+                        {
+                            if (horarioPreferencialInicial != null && horario.TimeOfDay < horarioPreferencialInicial)
+                                continue;
+
+                            if (horarioPreferencialFinal != null && horario.TimeOfDay > horarioPreferencialFinal)
+                                continue;
+
+                            horariosIndisponiveis.Add(horario);
+                        }
                     }
                 }
 
-                List<Travamento> travamentos = await _travamentoRepository
-                    .GetListAsync(x => x.DataHoraInicio.Date >= DateTime.Now.Date);
+                // Retorna apenas os horários que estão indisponíveis para todos os barbeiros
+                var horariosIndisponiveisParaTodos = horariosIndisponiveis
+                    .GroupBy(h => h)
+                    .Where(g => g.Count() == barbeirosServico.Count)
+                    .Select(g => g.Key)
+                    .ToList();
 
-                foreach (Travamento travamento in travamentos)
-                {
-                    DateTime dataHoraInicio = travamento.DataHoraInicio;
-                    DateTime dataHoraFim = travamento.DataHoraFim;
-
-                    for (DateTime horario = dataHoraInicio; horario < dataHoraFim; horario = horario.AddMinutes(15))
-                    {
-                        if (horarioPreferencialInicial != null && horario.TimeOfDay < horarioPreferencialInicial)
-                            continue;
-                        if (horarioPreferencialFinal != null && horario.TimeOfDay > horarioPreferencialFinal)
-                            continue;
-
-                        horariosIndisponiveis.Add(horario);
-                    }
-                }
-
-                return new(horariosIndisponiveis);
+                return new(horariosIndisponiveisParaTodos);
             }
             catch (Exception ex)
             {
@@ -247,8 +268,21 @@ namespace BackendBarbaEmDia.Domain.Services
             if (horarioForaDoExpediente)
                 return new(false, "Horário fora do expediente");
 
+            if (agendamento.IdBarbeiro is null || agendamento.IdBarbeiro == 0)
+            {
+                ServiceResult<int> resultEncontrarBabeiro = await EncontrarBarbeiroDisponivel(agendamento);
+
+                if (!resultEncontrarBabeiro.Success)
+                    return resultEncontrarBabeiro;
+
+                agendamento.IdBarbeiro = resultEncontrarBabeiro.Data;
+            }
+
             bool horarioTravado = await _travamentoRepository.ExistsAsync(
-                x => agendamento.DataHoraInicio >= x.DataHoraInicio && agendamento.DataHoraInicio <= x.DataHoraFim);
+                x => x.IdBarbeiro == agendamento.IdBarbeiro &&
+                     agendamento.DataHoraInicio >= x.DataHoraInicio &&
+                     agendamento.DataHoraInicio <= x.DataHoraFim
+                );
 
             if (horarioTravado)
                 return new(false, "Horário indisponível para agendamento");
@@ -260,14 +294,14 @@ namespace BackendBarbaEmDia.Domain.Services
                     x => x.IdBarbeiro == agendamento.IdBarbeiro &&
                     (id == null || x.Id != id) &&
                     (
-                        (agendamento.DataHoraInicio >= x.DataHoraInicio && agendamento.DataHoraInicio < x.DataHoraInicio.Add(x.Duracao)) || // Início no meio de outro
-                        (terminoServico > x.DataHoraInicio && terminoServico <= x.DataHoraInicio.Add(x.Duracao)) || // Término no meio de outro
-                        (agendamento.DataHoraInicio <= x.DataHoraInicio && terminoServico >= x.DataHoraInicio.Add(x.Duracao)) // Engloba outro
+                        (agendamento.DataHoraInicio >= x.DataHoraInicio && agendamento.DataHoraInicio < (x.DataHoraInicio + x.Duracao)) || // Início no meio de outro
+                        (terminoServico > x.DataHoraInicio && terminoServico <= (x.DataHoraInicio + x.Duracao)) || // Término no meio de outro
+                        (agendamento.DataHoraInicio <= x.DataHoraInicio && terminoServico >= (x.DataHoraInicio + x.Duracao)) // Engloba outro
                     )
                 );
 
             if (agendamentoExistente)
-                return new(false, "Horário já agendado para o barbeiro");
+                return new(false, "Horário já agendado");
 
             return new("Agendamento válido");
         }
@@ -294,6 +328,63 @@ namespace BackendBarbaEmDia.Domain.Services
                 duracaoServico = barbeiroServico.TempoPersonalizado.Value;
 
             return new(duracaoServico);
+        }
+
+        private async Task<ServiceResult<int>> EncontrarBarbeiroDisponivel(AddUpdateAgendamentoRequest agendamento)
+        {
+            try
+            {
+                // Obter a duração do serviço
+                ServiceResult<TimeSpan> duracaoServicoResult = await ObterDuracaoServico(agendamento.IdServico);
+
+                if (!duracaoServicoResult.Success)
+                    return new(false, "Erro ao obter duração do serviço: " + duracaoServicoResult.Message);
+
+                agendamento.Duracao = duracaoServicoResult.Data;
+
+                // Obter todos os barbeiros que realizam o serviço
+                List<BarbeiroServico> barbeirosServico = await _barbeiroServicoRepository.GetBarbeirosByServicoId(agendamento.IdServico);
+
+                if (!barbeirosServico.Any())
+                    return new(false, "Nenhum barbeiro disponível para este serviço");
+
+                foreach (var barbeiroServico in barbeirosServico)
+                {
+                    int idBarbeiro = barbeiroServico.IdBarbeiro;
+
+                    // Verificar se o barbeiro está disponível no horário solicitado
+                    bool horarioIndisponivel = await _agendamentoRepository.ExistsAsync(
+                        x => x.IdBarbeiro == idBarbeiro &&
+                             (
+                                 (agendamento.DataHoraInicio >= x.DataHoraInicio && agendamento.DataHoraInicio < (x.DataHoraInicio + x.Duracao)) || // Início no meio de outro
+                                 (agendamento.DataHoraInicio.Add(agendamento.Duracao.Value) > x.DataHoraInicio && agendamento.DataHoraInicio.Add(agendamento.Duracao.Value) <= (x.DataHoraInicio + x.Duracao)) || // Término no meio de outro
+                                 (agendamento.DataHoraInicio <= x.DataHoraInicio && agendamento.DataHoraInicio.Add(agendamento.Duracao.Value) >= (x.DataHoraInicio + x.Duracao)) // Engloba outro
+                             )
+                    );
+
+                    if (horarioIndisponivel)
+                        continue;
+
+                    // Verificar se o barbeiro não está com horário travado
+                    bool horarioTravado = await _travamentoRepository.ExistsAsync(
+                        x => x.IdBarbeiro == idBarbeiro &&
+                             agendamento.DataHoraInicio >= x.DataHoraInicio &&
+                             agendamento.DataHoraInicio < x.DataHoraFim
+                    );
+
+                    if (horarioTravado)
+                        continue;
+
+                    // Se passou por todas as verificações, o barbeiro está disponível
+                    return new(idBarbeiro, "Barbeiro disponível encontrado");
+                }
+
+                return new(false, "Nenhum barbeiro disponível para o horário solicitado");
+            }
+            catch (Exception ex)
+            {
+                return new(false, $"Erro ao encontrar barbeiro disponível: {ex.GetFullMessage()}", true);
+            }
         }
     }
 }

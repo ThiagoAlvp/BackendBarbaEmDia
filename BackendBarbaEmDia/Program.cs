@@ -108,6 +108,7 @@ builder.Services.AddScoped<IAgendamentoService, AgendamentoService>();
 builder.Services.AddScoped<ITravamentoService, TravamentoService>();
 builder.Services.AddScoped<IBarbeiroServicoService, BarbeiroServicoService>();
 builder.Services.AddScoped<IParametrizacaoHorarioFuncionamentoService, ParametrizacaoHorarioFuncionamentoService>();
+builder.Services.AddScoped<IEstatisticasService, EstatisticasService>();
 #endregion
 
 #region Repositories

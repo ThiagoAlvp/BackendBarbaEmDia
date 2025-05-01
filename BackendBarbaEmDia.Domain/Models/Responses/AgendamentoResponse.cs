@@ -15,12 +15,12 @@ namespace BackendBarbaEmDia.Domain.Models.Responses
         public string Status { get; set; } = agendamento.Status;
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Cliente? Cliente { get; set; } = agendamento.Cliente;
+        public ClienteResponse? Cliente { get; set; } = agendamento.Cliente is null ? null : new(agendamento.Cliente);
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Barbeiro? Barbeiro { get; set; } = agendamento.Barbeiro;
+        public BarbeiroResponse? Barbeiro { get; set; } = agendamento.Barbeiro is null ? null : new(agendamento.Barbeiro);
         
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Servico? Servico { get; set; } = agendamento.Servico;
+        public ServicoResponse? Servico { get; set; } = agendamento.Servico is null ? null : new(agendamento.Servico);
     }
 }
