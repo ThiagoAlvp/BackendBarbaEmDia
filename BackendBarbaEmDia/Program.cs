@@ -142,10 +142,10 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseCors("AllowEspecificOrigin");
-}
+//}
 
 app.UseHttpsRedirection();
 
