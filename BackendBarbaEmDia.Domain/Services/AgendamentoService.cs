@@ -294,7 +294,8 @@ namespace BackendBarbaEmDia.Domain.Services
 
             bool agendamentoExistente = await _agendamentoRepository
                 .ExistsAsync(
-                    x => x.IdBarbeiro == agendamento.IdBarbeiro &&
+                    x => x.IdBarbeiro == agendamento.IdBarbeiro && 
+                    x.Status != "Cancelado" && // Ignora agendamentos cancelados
                     (id == null || x.Id != id) &&
                     (
                         (agendamento.DataHoraInicio >= x.DataHoraInicio && agendamento.DataHoraInicio < (x.DataHoraInicio + x.Duracao)) || // Início no meio de outro
@@ -361,6 +362,7 @@ namespace BackendBarbaEmDia.Domain.Services
                     // Verificar se o barbeiro está disponível no horário solicitado
                     bool horarioIndisponivel = await _agendamentoRepository.ExistsAsync(
                         x => x.IdBarbeiro == idBarbeiro &&
+                                x.Status != "Cancelado" && // Ignora agendamentos cancelados
                              (
                                  (agendamento.DataHoraInicio >= x.DataHoraInicio && agendamento.DataHoraInicio < (x.DataHoraInicio + x.Duracao)) || // Início no meio de outro
                                  (agendamento.DataHoraInicio.Add(agendamento.Duracao.Value) > x.DataHoraInicio && agendamento.DataHoraInicio.Add(agendamento.Duracao.Value) <= (x.DataHoraInicio + x.Duracao)) || // Término no meio de outro
