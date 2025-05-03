@@ -44,7 +44,7 @@ namespace BackendBarbaEmDia.Controllers
         [HttpDelete()]
         public async Task<ActionResult<APIResponse>> Delete(int idBarbeiro, int idServico)
         {
-            ServiceResult result = await _barbeiroServicoService.DeleteBarbeiroServicoAsync(id);
+            ServiceResult result = await _barbeiroServicoService.DeleteBarbeiroServicoAsync(idBarbeiro, idServico);
 
             return this.TrataServiceResult(result);
         }
