@@ -278,6 +278,13 @@ namespace BackendBarbaEmDia.Domain.Services
                 agendamento.IdBarbeiro = resultEncontrarBabeiro.Data;
             }
 
+            duracaoServicoResult = await ObterDuracaoServico(agendamento.IdServico, agendamento.IdBarbeiro);
+
+            if (!duracaoServicoResult.Success)
+                return duracaoServicoResult;
+
+            agendamento.Duracao = duracaoServicoResult.Data;
+
             bool horarioTravado = await _travamentoRepository.ExistsAsync(
                 x => x.IdBarbeiro == agendamento.IdBarbeiro &&
                      agendamento.DataHoraInicio >= x.DataHoraInicio &&
@@ -351,6 +358,9 @@ namespace BackendBarbaEmDia.Domain.Services
                 foreach (var barbeiroServico in barbeirosServico)
                 {
                     int idBarbeiro = barbeiroServico.IdBarbeiro;
+
+                    if (barbeiroServico.TempoPersonalizado != null && barbeiroServico.TempoPersonalizado != TimeSpan.Zero)
+                        agendamento.Duracao = barbeiroServico.TempoPersonalizado.Value;
 
                     // Verificar se o barbeiro está disponível no horário solicitado
                     bool horarioIndisponivel = await _agendamentoRepository.ExistsAsync(
