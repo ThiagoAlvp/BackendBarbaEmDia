@@ -43,11 +43,11 @@ namespace BackendBarbaEmDia.Domain.Services
             }
         }
 
-        public async Task<ServiceResult> DeleteBarbeiroServicoAsync(int barbeiroServicoId)
+        public async Task<ServiceResult> DeleteBarbeiroServicoAsync(int barbeiroId, int servicoId)
         {
             try
             {
-                BarbeiroServico? barbeiroServico = await _barbeiroServicoRepository.GetByIdAsync(barbeiroServicoId);
+                BarbeiroServico? barbeiroServico = await _barbeiroServicoRepository.GetFirstAsync(x => x.IdBarbeiro == barbeiroId && x.IdServico == servicoId);
 
                 if (barbeiroServico is null)
                     return new(false, "Barbeiro e serviço não encontrados.");
