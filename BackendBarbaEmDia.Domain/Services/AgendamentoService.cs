@@ -173,12 +173,7 @@ namespace BackendBarbaEmDia.Domain.Services
         {
             try
             {
-                List<DateTime> horariosIndisponiveis = new();
-
-                ServiceResult<TimeSpan> duracaoServicoResult = await ObterDuracaoServico(idServico, idBarbeiro);
-
-                if (!duracaoServicoResult.Success)
-                    return new(false, "Erro ao obter duração do serviço, " + duracaoServicoResult.Message);
+                List<DateTime> horariosIndisponiveis = new();                
 
                 List<BarbeiroServico> barbeirosServico = await _barbeiroServicoRepository.GetBarbeirosByServicoId(idServico);
 
@@ -194,7 +189,8 @@ namespace BackendBarbaEmDia.Domain.Services
 
                     List<Agendamento> agendamentos = await _agendamentoRepository
                         .GetListAsync(x => x.IdBarbeiro == idBarbeiroAtual &&
-                                           x.DataHoraInicio.Date >= DateTime.Now.Date);
+                                           x.DataHoraInicio.Date >= DateTime.Now.Date &&
+                                           x.Status != "Cancelado");
 
                     foreach (Agendamento agendamento in agendamentos)
                     {
